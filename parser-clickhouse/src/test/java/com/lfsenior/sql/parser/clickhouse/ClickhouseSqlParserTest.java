@@ -6,6 +6,7 @@ import com.lfsenior.sql.parser.clickhouse.antlr4.ClickHouseParser;
 import com.lfsenior.sql.parser.clickhouse.antlr4.ClickHouseParserBaseVisitor;
 import lombok.Data;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
@@ -62,6 +63,21 @@ public class ClickhouseSqlParserTest {
         System.out.println(visitor.getParserVo());
     }
 
+    @Test
+    public void testColumnExpr() {
+        String sql = "select dfsum(sum(b)) from b";
+        ClickHouseLexer lexer = new ClickHouseLexer(CharStreams.fromString(sql));
+        CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+        ClickHouseParser parser = new ClickHouseParser(commonTokenStream);
+        parser.addErrorListener(ClickHouseErrorListener.INSTANCE);
+        ClickHouseParser.QueryStmtContext queryStmtContext = parser.queryStmt();
+        QueryStmtVisitor visitor = new QueryStmtVisitor().init();
+        queryStmtContext.accept(visitor);
+        System.out.println(visitor.getParserVo());
+    }
+
+
+
 
     /**
      * 读取转换器
@@ -76,6 +92,17 @@ public class ClickhouseSqlParserTest {
             columnsList = new ArrayList<>();
             columnDefVisitor = new ColumnDefVisitor();
             return this;
+        }
+
+        @Override
+        public MetaDdlSqlParserVo visitColumnExprFunction(ClickHouseParser.ColumnExprFunctionContext ctx) {
+            int childCount = ctx.getChildCount();
+            System.out.println(childCount);
+            for (int i = 0; i < childCount; i++) {
+                ParseTree child = ctx.getChild(i);
+                System.out.println(child.getText());
+            }
+            return super.visitColumnExprFunction(ctx);
         }
 
         public MetaDdlSqlParserVo getParserVo() {

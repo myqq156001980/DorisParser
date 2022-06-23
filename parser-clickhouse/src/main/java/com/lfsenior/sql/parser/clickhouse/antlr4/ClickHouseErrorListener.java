@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.Recognizer;
 public class ClickHouseErrorListener extends BaseErrorListener {
     public static final ClickHouseErrorListener INSTANCE = new ClickHouseErrorListener();
 
+    @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
         throw new RuntimeException("CK解析异常line " + line + ":" + charPositionInLine + " " + msg);
     }
